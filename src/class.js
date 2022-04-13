@@ -27,7 +27,7 @@ mobile and desktop clients.
 export default class ResizableColumns {
 	constructor($table, options) {
 		this.ns = '.rc' + this.count++;
-
+		this.originalTableLayout = $table.css('table-layout')
 		this.options = $.extend({}, ResizableColumns.defaults, options);
 
 		this.$window = $(window);
@@ -71,6 +71,9 @@ export default class ResizableColumns {
 		// Assign percentage widths first, then create drag handles
 		this.assignPercentageWidths();
 		this.createHandles();
+
+		//fixed table
+		this.$table.css("table-layout","fixed")
 	}
 
 	/**
@@ -85,7 +88,7 @@ export default class ResizableColumns {
 		}
 
 		this.$handleContainer = $(`<div class='${CLASS_HANDLE_CONTAINER}' />`)
-		this.$table.before(this.$handleContainer);
+		this.options.handleContainer ? this.options.handleContainer.before(this.$handleContainer) : this.$table.before(this.$handleContainer);
 
 		this.$tableHeaders.each((i, el) => {
 			let $current = this.$tableHeaders.eq(i);
@@ -111,7 +114,7 @@ export default class ResizableColumns {
 	assignPercentageWidths() {
 		this.$tableHeaders.each((_, el) => {
 			let $el = $(el);
-			this.setWidth($el[0], $el.outerWidth() / this.$table.width() * 100);
+			this.setWidth($el[0], $el.outerWidth()+ this.options.padding);
 		});
 	}
 
@@ -256,7 +259,7 @@ export default class ResizableColumns {
 		if(!this.operation) { return; }
 
 		// Determine the delta change between start and new mouse position, as a percentage of the table width
-		let difference = (this.getPointerX(event) - op.startX) / this.$table.width() * 100;
+		let difference = this.getPointerX(event) - op.startX;
 		if(difference === 0) {
 			return;
 		}
@@ -265,14 +268,8 @@ export default class ResizableColumns {
 		let rightColumn = op.$rightColumn[0];
 		let widthLeft, widthRight;
 
-		if(difference > 0) {
-			widthLeft = this.constrainWidth(op.widths.left + (op.widths.right - op.newWidths.right));
-			widthRight = this.constrainWidth(op.widths.right - difference);
-		}
-		else if(difference < 0) {
-			widthLeft = this.constrainWidth(op.widths.left + difference);
-			widthRight = this.constrainWidth(op.widths.right + (op.widths.left - op.newWidths.left));
-		}
+		widthLeft = this.constrainWidth(op.widths.left + difference);
+		widthRight = this.constrainWidth(op.widths.right);
 
 		if(leftColumn) {
 			this.setWidth(leftColumn, widthLeft);
@@ -443,7 +440,7 @@ export default class ResizableColumns {
 	@return {Number} Element's width as a float
 	**/
 	parseWidth(element) {
-		return element ? parseFloat(element.style.width.replace('%', '')) : 0;
+		return element ? parseFloat(element.style.width) : 0;
 	}
 
 	/**
@@ -457,7 +454,7 @@ export default class ResizableColumns {
 	setWidth(element, width) {
 		width = width.toFixed(2);
 		width = width > 0 ? width : 0;
-		element.style.width = width + '%';
+		$(element).width(width)
 	}
 
 	/**
@@ -507,6 +504,9 @@ ResizableColumns.defaults = {
 
 		return SELECTOR_TD;
 	},
+	//jquery element of the handleContainer position,handleContainer will before the element, default will be this table
+	handleContainer:null,
+	padding:0,
 	store: window.store,
 	syncHandlers: true,
 	resizeFromBody: true,

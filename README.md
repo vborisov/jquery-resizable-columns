@@ -7,6 +7,30 @@ Resizable table columns for jQuery. **[Live Demo](http://dobtco.github.io/jquery
 
 **Size:** < 8kb minified
 
+---
+
+I made some changes to the original author's above
+
+if you used `bootstrap-table` ,you can also see [https://github.com/thetbw/bootstrap-table](https://github.com/thetbw/bootstrap-table/commit/e3f39b648f52c0f8703d67e2047f9f4999648f83)
+
+It's not perfect, and some you may need to modify yourself
+
+if you want build by you self,maybe you need create a file named `npm-shrinkwrap.json` in
+project root,and add this content,because origin dependencies was so old.
+```json
+{
+"dependencies": {
+  "graceful-fs": {
+      "version": "4.2.2"
+    }
+  }
+}
+```
+
+**bugfix change log:**
+* Change table layout to 'fixed'
+* Change from percentage width to pixel width
+
 #### Dependencies
 - jQuery
 - [store.js](https://github.com/marcuswestin/store.js/) (or anything similar) for localStorage persistence.
