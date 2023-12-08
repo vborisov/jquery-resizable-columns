@@ -511,7 +511,7 @@ ResizableColumns.defaults = {
 	syncHandlers: true,
 	resizeFromBody: true,
 	maxWidth: null,
-	minWidth: 0.01
+	minWidth: 50
 };
 
 ResizableColumns.count = 0;
